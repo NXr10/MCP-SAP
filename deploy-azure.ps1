@@ -21,10 +21,25 @@ param(
     [string]$Location = "East US",
     
     [Parameter(Mandatory=$false)]
-    [string]$ImageTag = "latest"
+    [string]$ImageTag = "latest",
+    
+    [Parameter(Mandatory=$true)]
+    [string]$SapBaseUrl,
+    
+    [Parameter(Mandatory=$true)]
+    [string]$SapCompanyDb,
+    
+    [Parameter(Mandatory=$true)]
+    [string]$SapUsername,
+    
+    [Parameter(Mandatory=$true)]
+    [string]$SapPassword
 )
 
 Write-Host " Iniciando despliegue de servidor MCP SAP en Azure Container Apps..." -ForegroundColor Green
+Write-Host " IMPORTANTE: Este script requiere credenciales SAP como parámetros por seguridad" -ForegroundColor Yellow
+Write-Host " Ejemplo de uso:" -ForegroundColor Cyan
+Write-Host " .\deploy-azure.ps1 -ResourceGroupName 'rg-mcp-sap' -ContainerAppEnvironmentName 'cae-mcp-sap' -ContainerAppName 'app-sap-mcp' -ContainerRegistryName 'acrmcpsap' -VNetName 'vnet-mcp-sap' -SubnetName 'subnet-container-apps' -SapBaseUrl 'https://your-sap:50000/b1s/v2' -SapCompanyDb 'YOUR_DB' -SapUsername 'your_user' -SapPassword 'your_password'" -ForegroundColor Cyan
 
 # Variables
 $ImageName = "sap-mcp-server"
@@ -129,7 +144,7 @@ try {
         --ingress external `
         --target-port 8000 `
         --env-vars "LOG_LEVEL=INFO" "PYTHONUNBUFFERED=1" `
-        --secrets "sap-base-url=https://tu-sap-ip:50000/b1s/v2" "sap-company-db=SBODEMOUS" "sap-username=administrador" "sap-password=1234" `
+        --secrets "sap-base-url=$SapBaseUrl" "sap-company-db=$SapCompanyDb" "sap-username=$SapUsername" "sap-password=$SapPassword" `
         --env-vars "SAP_BASE_URL=secretref:sap-base-url" "SAP_COMPANY_DB=secretref:sap-company-db" "SAP_USERNAME=secretref:sap-username" "SAP_PASSWORD=secretref:sap-password"
 
     Write-Host "Container App desplegado: $ContainerAppName" -ForegroundColor Green

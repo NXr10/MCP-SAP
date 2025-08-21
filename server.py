@@ -8,7 +8,7 @@ import json
 import logging
 from typing import Any, Sequence
 from dotenv import load_dotenv
-from fastapi import FastAPI
+from fastapi import FastAPI, Response
 from mcp.server import Server
 from mcp.types import Resource, Tool, TextContent, ImageContent, EmbeddedResource
 from sap_client import SAPClient
@@ -244,8 +244,12 @@ async def handle_call_tool(name: str, arguments: dict[str, Any] | None) -> list[
         )]
 
 @app.post("/mcp")
-async def handle_mcp_request(request: dict):
+async def handle_mcp_request(request: dict, response: Response):
     """Endpoint principal para manejar solicitudes MCP"""
+    
+    # Agregar header requerido para Microsoft Copilot Studio
+    response.headers["x-ms-agentic-protocol"] = "mcp-streamable-1.0"
+    
     try:
         logger.info(f"Recibida solicitud MCP: {request}")
         
