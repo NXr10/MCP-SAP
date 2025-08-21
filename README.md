@@ -96,16 +96,16 @@ docker run -p 8000:8000 --env-file .env sap-mcp-server
   "params": {
     "name": "sap_create_sales_order",
     "arguments": {
-      "CardCode": "C-00000001",
-      "DocDueDate": "20250830",
+      "CardCode": "CUSTOMER_CODE",
+      "DocDueDate": "YYYYMMDD",
       "DocCurrency": "USD",
-      "DocRate": 8.25,
+      "DocRate": 1.0,
       "DocumentLines": [
         {
-          "ItemCode": "ACC-00025",
-          "Quantity": "100",
-          "TaxCode": "IVA",
-          "UnitPrice": "1000"
+          "ItemCode": "ITEM_CODE",
+          "Quantity": "1",
+          "TaxCode": "TAX_CODE",
+          "UnitPrice": "100.00"
         }
       ]
     }
@@ -124,14 +124,14 @@ docker run -p 8000:8000 --env-file .env sap-mcp-server
         "type": "text",
         "text": "✅ Sales Order creada exitosamente:
 {
-  "status": "success",
-  "DocEntry": 7535,
-  "DocNum": 2687,
-  "CardCode": "C-00000001",
-  "CardName": "& CAFE, SOCIEDAD ANONIMA",
-  "DocTotal": 20790.0,
-  "DocCurrency": "USD",
-  "DocRate": 8.25
+  \"status\": \"success\",
+  \"DocEntry\": 12345,
+  \"DocNum\": 1001,
+  \"CardCode\": \"CUSTOMER_CODE\",
+  \"CardName\": \"Customer Name\",
+  \"DocTotal\": 1000.0,
+  \"DocCurrency\": \"USD\",
+  \"DocRate\": 1.0
 }"
       }
     ]
@@ -177,21 +177,16 @@ SAP Business One Server
 
 - **`sap_connect`**: Conectar a SAP Business One
 - **`sap_status`**: Verificar estado de conexión
-- **`sap_disconnect`**: Desconectar de SAP
-- **`sap_query`**: Consultar datos de SAP (BusinessPartners, Items, Orders, etc.)
+- **`sap_create_sales_order`**: Crear Sales Orders con validación completa
 
 ### Recursos MCP Disponibles
 
 - **`sap://status`**: Estado actual de la conexión SAP
-- **`sap://config`**: Configuración del servidor SAP
 
 ### Endpoints HTTP
 
 - **`POST /mcp`**: Endpoint principal para protocolo MCP streamable
 - **`GET /health`**: Verificación de salud del servidor
-- **`GET /tools`**: Lista de herramientas disponibles (debug)
-- **`GET /resources`**: Lista de recursos disponibles (debug)
-- **`POST /test/{tool_name}`**: Probar herramientas individualmente (debug)
 
 ## 🛠️ Configuración
 
@@ -208,8 +203,8 @@ Completa las variables:
 ```env
 # SAP Business One Service Layer
 SAP_BASE_URL=https://your-sap-server:50000/b1s/v1
-SAP_COMPANY_DB=SBODemoUS
-SAP_USERNAME=manager
+SAP_COMPANY_DB=YOUR_COMPANY_DB
+SAP_USERNAME=your_username
 SAP_PASSWORD=your-password
 ```
 
@@ -220,7 +215,7 @@ SAP_PASSWORD=your-password
 pip install -r requirements.txt
 
 # Ejecutar servidor
-python server_http.py
+python server.py
 ```
 
 El servidor estará disponible en `http://localhost:8000`
@@ -228,14 +223,13 @@ El servidor estará disponible en `http://localhost:8000`
 ### 3. Probar Localmente
 
 ```bash
-# Ejecutar suite de pruebas
-python test_mcp_http.py
-
-# Probar solo salud
-python test_mcp_http.py --test health
-
-# Probar endpoint específico
+# Verificar salud del servidor
 curl http://localhost:8000/health
+
+# Probar herramientas MCP
+curl -X POST http://localhost:8000/mcp \
+  -H "Content-Type: application/json" \
+  -d '{"jsonrpc":"2.0","method":"tools/list","id":1}'
 ```
 
 ## ☁️ Despliegue en Azure
@@ -264,8 +258,8 @@ curl http://localhost:8000/health
 # Variables de entorno en Container App
 az containerapp secret set --name app-sap-mcp --resource-group rg-mcp-sap \
   --secrets sap-base-url="https://your-sap:50000/b1s/v1" \
-            sap-company-db="SBODemoUS" \
-            sap-username="manager" \
+            sap-company-db="YOUR_COMPANY_DB" \
+            sap-username="your_username" \
             sap-password="your-password"
 ```
 
@@ -291,11 +285,11 @@ az containerapp secret set --name app-sap-mcp --resource-group rg-mcp-sap \
 ### 3. Ejemplo de Uso en Copilot
 
 ```
-Usuario: "Conecta a SAP y muéstrame los primeros 5 clientes"
+Usuario: "Conecta a SAP y crea una orden de venta"
 
 Copilot ejecutará:
 1. sap_connect() - para conectar
-2. sap_query(entity="BusinessPartners", filter="$top=5") - para consultar
+2. sap_create_sales_order(CardCode="CUSTOMER", DocumentLines=[...]) - para crear la orden
 ```
 
 ## 🧪 Pruebas del Protocolo MCP
@@ -307,10 +301,16 @@ Copilot ejecutará:
   "jsonrpc": "2.0",
   "method": "tools/call",
   "params": {
-    "name": "sap_query",
+    "name": "sap_create_sales_order",
     "arguments": {
-      "entity": "BusinessPartners",
-      "filter": "$top=5"
+      "CardCode": "CUSTOMER_CODE",
+      "DocumentLines": [
+        {
+          "ItemCode": "ITEM_CODE",
+          "Quantity": "1",
+          "UnitPrice": "100.00"
+        }
+      ]
     }
   },
   "id": 1
@@ -327,7 +327,7 @@ Copilot ejecutará:
     "content": [
       {
         "type": "text",
-        "text": "✅ Consulta exitosa a BusinessPartners:\nTotal de registros: 150\nPrimeros 5 registros:\n[...]"
+        "text": "✅ Sales Order creada exitosamente: DocEntry 12345"
       }
     ]
   }
@@ -338,9 +338,8 @@ Copilot ejecutará:
 
 ```
 MCP-SAP-main/
-├── server_http.py          # Servidor HTTP principal con FastAPI
+├── server.py               # Servidor MCP principal con FastAPI
 ├── sap_client.py           # Cliente para SAP Business One Service Layer
-├── test_mcp_http.py        # Suite de pruebas del protocolo MCP
 ├── sap-mcp-schema.yaml     # Schema OpenAPI para Custom Connector
 ├── deploy-azure.ps1        # Script de despliegue en Azure
 ├── Dockerfile              # Imagen de contenedor
@@ -376,24 +375,6 @@ elif name == "nueva_herramienta":
     return [TextContent(type="text", text="Resultado")]
 ```
 
-### Agregar Nuevo Recurso
-
-1. Definir en `handle_list_resources()`:
-```python
-Resource(
-    uri="sap://nuevo_recurso",
-    name="Nuevo Recurso",
-    description="Descripción del recurso",
-    mimeType="text/plain"
-)
-```
-
-2. Implementar en `handle_read_resource()`:
-```python
-elif uri == "sap://nuevo_recurso":
-    return [TextContent(type="text", text="Contenido del recurso")]
-```
-
 ## 🔍 Troubleshooting
 
 ### Problemas Comunes
@@ -416,7 +397,7 @@ elif uri == "sap://nuevo_recurso":
 
 ```bash
 # Ver logs locales
-python server_http.py  # Logs aparecen en consola
+python server.py  # Logs aparecen en consola
 
 # Ver logs en Azure
 az containerapp logs show --name app-sap-mcp --resource-group rg-mcp-sap --follow
@@ -510,13 +491,9 @@ az containerapp logs show \
 az containerapp exec \
     --name $ContainerAppName \
     --resource-group $ResourceGroupName
-```
 
-### Probar conectividad a SAP
-
-```bash
-# Desde dentro del contenedor
-python test_sap.py
+# Verificar variables de entorno
+echo $SAP_BASE_URL
 ```
 
 ## 🔐 Seguridad
