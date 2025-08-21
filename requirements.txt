@@ -1,0 +1,23 @@
+# Dependencias para el servidor MCP SAP
+# =====================================
+
+# Framework MCP
+mcp>=1.0.0
+
+# Cliente HTTP para SAP API  
+requests>=2.31.0
+
+# Variables de entorno
+python-dotenv>=1.0.0
+
+# Validación de datos
+pydantic>=2.0.0
+
+# Azure SDK para Key Vault
+azure-identity>=1.15.0
+azure-keyvault-secrets>=4.8.0
+
+# FastAPI para endpoint HTTP
+fastapi>=0.104.0
+uvicorn>=0.24.0
+

@@ -1,0 +1,211 @@
+swagger: "2.0"
+info:
+  title: SAP Business One MCP Server
+  description: |
+    Servidor MCP (Model Context Protocol) para integrar SAP Business One con Microsoft Copilot Studio.
+    
+    Proporciona herramientas para:
+    - Conectar a SAP Business One
+    - Verificar estado de conexión
+    - Crear Sales Orders en SAP
+    
+    Protocolo soportado: mcp-streamable-1.0
+    Documentación: https://github.com/NXr10/MCP-SAP
+  version: 1.0.0
+  contact:
+    name: SAP MCP Server Support
+    url: https://github.com/NXr10/MCP-SAP
+host: localhost:8000
+basePath: /
+schemes:
+  - http
+  - https
+consumes:
+  - application/json
+produces:
+  - application/json
+  
+paths:
+  /mcp:
+    post:
+      summary: SAP Business One MCP Server Endpoint
+      description: |
+        Endpoint principal para interactuar con SAP Business One mediante el protocolo MCP.
+        
+        Herramientas disponibles:
+        - sap_connect: Conectar a SAP Business One
+        - sap_status: Verificar estado de conexión
+        - sap_create_sales_order: Crear Sales Orders en SAP
+      x-ms-agentic-protocol: mcp-streamable-1.0
+      operationId: InvokeMCP
+      parameters:
+        - name: body
+          in: body
+          required: true
+          description: Solicitud MCP en formato JSON-RPC 2.0
+          schema:
+            type: object
+            properties:
+              jsonrpc:
+                type: string
+                enum: ["2.0"]
+                description: Versión del protocolo JSON-RPC
+              method:
+                type: string
+                enum: 
+                  - "tools/list"
+                  - "tools/call"
+                description: Método MCP a invocar
+              params:
+                type: object
+                description: Parámetros del método (opcional)
+              id:
+                type: number
+                description: ID de la solicitud
+            required:
+              - jsonrpc
+              - method
+              - id
+            example:
+              jsonrpc: "2.0"
+              method: "tools/call"
+              params:
+                name: "sap_create_sales_order"
+                arguments:
+                  CardCode: "CUSTOMER_CODE"
+                  DocDueDate: "YYYYMMDD"
+                  DocCurrency: "CURRENCY_CODE"
+                  DocRate: 1.0
+                  DocumentLines:
+                    - ItemCode: "ITEM_CODE"
+                      Quantity: "1"
+                      TaxCode: "TAX_CODE"
+                      UnitPrice: "0.00"
+              id: 1
+      responses:
+        "200":
+          description: Operación exitosa
+          schema:
+            type: object
+            properties:
+              jsonrpc:
+                type: string
+                enum: ["2.0"]
+              id:
+                type: number
+              result:
+                type: object
+                description: Resultado de la operación
+              error:
+                type: object
+                description: Error si la operación falló
+                properties:
+                  code:
+                    type: number
+                  message:
+                    type: string
+          examples:
+            application/json:
+              jsonrpc: "2.0"
+              id: 1
+              result:
+                content:
+                  - type: "text"
+                    text: "✅ Sales Order creada exitosamente: DocEntry 7535, DocNum 2687"
+        "400":
+          description: Solicitud incorrecta - Formato JSON-RPC inválido
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+        "401":
+          description: No autorizado - Credenciales SAP inválidas
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+        "500":
+          description: Error interno del servidor
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+  
+  /health:
+    get:
+      summary: Verificación de salud del servidor
+      description: Verifica el estado del servidor MCP y la conexión SAP
+      operationId: HealthCheck
+      responses:
+        "200":
+          description: Estado del servidor
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                enum: ["healthy"]
+              timestamp:
+                type: string
+                format: date-time
+                example: "2025-08-20T00:00:00Z"
+              sap_connection:
+                type: string
+                enum: ["connected", "disconnected"]
+                example: "connected"
+
+definitions:
+  MCPRequest:
+    type: object
+    required:
+      - jsonrpc
+      - method
+      - id
+    properties:
+      jsonrpc:
+        type: string
+        enum: ["2.0"]
+      method:
+        type: string
+        enum: ["tools/list", "tools/call"]
+      params:
+        type: object
+      id:
+        type: number
+        
+  MCPResponse:
+    type: object
+    required:
+      - jsonrpc
+      - id
+    properties:
+      jsonrpc:
+        type: string
+        enum: ["2.0"]
+      id:
+        type: number
+      result:
+        type: object
+      error:
+        type: object
+        properties:
+          code:
+            type: number
+          message:
+            type: string
+
+  HealthResponse:
+    type: object
+    properties:
+      status:
+        type: string
+        enum: ["healthy"]
+      timestamp:
+        type: string
+        format: date-time
+      sap_connection:
+        type: string
+        enum: ["connected", "disconnected"]

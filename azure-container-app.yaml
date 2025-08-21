@@ -1,0 +1,100 @@
+# Configuración para Azure Container Apps
+# =======================================
+
+# Configuración de la aplicación
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sap-mcp-config
+data:
+  # Variables de entorno que serán inyectadas en el contenedor
+  LOG_LEVEL: "INFO"
+  PYTHONUNBUFFERED: "1"
+
+---
+# Secretos para credenciales SAP
+apiVersion: v1
+kind: Secret
+metadata:
+  name: sap-mcp-secrets
+type: Opaque
+stringData:
+  # Estas serán configuradas desde Azure Key Vault o variables de entorno
+  # IMPORTANTE: Reemplazar estos valores con tus credenciales reales
+  SAP_BASE_URL: "https://YOUR-SAP-SERVER:50000/b1s/v2"
+  SAP_COMPANY_DB: "YOUR_COMPANY_DB"
+  SAP_USERNAME: "YOUR_USERNAME"
+  SAP_PASSWORD: "YOUR_PASSWORD"
+
+---
+# Definición del Container App
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sap-mcp-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sap-mcp-server
+  template:
+    metadata:
+      labels:
+        app: sap-mcp-server
+    spec:
+      containers:
+        - name: sap-mcp-server
+          image: "YOUR-REGISTRY.azurecr.io/sap-mcp-server:latest"
+          ports:
+            - containerPort: 8000
+          env:
+            # Variables desde ConfigMap
+            - name: LOG_LEVEL
+              valueFrom:
+                configMapKeyRef:
+                  name: sap-mcp-config
+                  key: LOG_LEVEL
+            # Variables desde Secrets
+            - name: SAP_BASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: sap-mcp-secrets
+                  key: SAP_BASE_URL
+            - name: SAP_COMPANY_DB
+              valueFrom:
+                secretKeyRef:
+                  name: sap-mcp-secrets
+                  key: SAP_COMPANY_DB
+            - name: SAP_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: sap-mcp-secrets
+                  key: SAP_USERNAME
+            - name: SAP_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: sap-mcp-secrets
+                  key: SAP_PASSWORD
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          livenessProbe:
+            exec:
+              command:
+                - python
+                - -c
+                - "import sys; sys.exit(0)" # Verificación simple
+            initialDelaySeconds: 30
+            periodSeconds: 30
+          readinessProbe:
+            exec:
+              command:
+                - python
+                - -c
+                - "import sys; sys.exit(0)" # Verificación simple
+            initialDelaySeconds: 5
+            periodSeconds: 10
