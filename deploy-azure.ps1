@@ -36,7 +36,7 @@ param(
     [string]$SapPassword
 )
 
-Write-Host " Iniciando despliegue de servidor MCP SAP en Azure Container Apps..." -ForegroundColor Green
+Write-Host "Iniciando despliegue de servidor MCP SAP en Azure Container Apps..." -ForegroundColor Green
 Write-Host " IMPORTANTE: Este script requiere credenciales SAP como parámetros por seguridad" -ForegroundColor Yellow
 Write-Host " Ejemplo de uso:" -ForegroundColor Cyan
 Write-Host " .\deploy-azure.ps1 -ResourceGroupName 'rg-mcp-sap' -ContainerAppEnvironmentName 'cae-mcp-sap' -ContainerAppName 'app-sap-mcp' -ContainerRegistryName 'acrmcpsap' -VNetName 'vnet-mcp-sap' -SubnetName 'subnet-container-apps' -SapBaseUrl 'https://your-sap:50000/b1s/v2' -SapCompanyDb 'YOUR_DB' -SapUsername 'your_user' -SapPassword 'your_password'" -ForegroundColor Cyan
@@ -165,7 +165,7 @@ try {
         Write-Host "`n URL de la aplicación: https://$appUrl" -ForegroundColor Green
     }
 
-    Write-Host "`n ¡Despliegue completado exitosamente!" -ForegroundColor Green
+    Write-Host "Despliegue completado exitosamente!" -ForegroundColor Green
     Write-Host "Para ver logs: az containerapp logs show --name $ContainerAppName --resource-group $ResourceGroupName" -ForegroundColor Cyan
 
 } catch {

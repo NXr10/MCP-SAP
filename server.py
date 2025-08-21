@@ -34,21 +34,21 @@ def get_sap_client():
         # Si no hay cliente, crear uno nuevo
         if sap_client is None:
             sap_client = SAPClient()
-            logger.info("🔧 Creando nuevo cliente SAP")
+            logger.info("Creando nuevo cliente SAP")
         
         # Verificar si la sesión es válida
         if not sap_client.is_session_valid():
-            logger.info("🔄 Sesión SAP inválida, reconectando...")
+            logger.info("Sesión SAP inválida, reconectando...")
             success = sap_client.login_from_env()
             if not success:
-                logger.error("❌ Error al conectar a SAP")
+                logger.error("Error al conectar a SAP")
                 return None
-            logger.info("✅ Sesión SAP restaurada")
+            logger.info("Sesión SAP restaurada")
         
         return sap_client
         
     except Exception as e:
-        logger.error(f"❌ Error en get_sap_client: {e}")
+        logger.error(f"Error en get_sap_client: {e}")
         return None
 
 # Crear servidor MCP
@@ -148,29 +148,29 @@ async def handle_call_tool(name: str, arguments: dict[str, Any] | None) -> list[
             if client:
                 return [TextContent(
                     type="text",
-                    text=f"✅ Conectado a SAP\nEmpresa: {client.company_db}\nSesión: {client.session_id[:20]}..."
+                    text=f"Conectado a SAP\nEmpresa: {client.company_db}\nSesión: {client.session_id[:20]}..."
                 )]
             else:
                 return [TextContent(
                     type="text",
-                    text="❌ Error al conectar a SAP"
+                    text="Error al conectar a SAP"
                 )]
         except Exception as e:
             return [TextContent(
                 type="text",
-                text=f"❌ Error: {str(e)}"
+                text=f"Error: {str(e)}"
             )]
     
     elif name == "sap_status":
         if sap_client and sap_client.session_id:
             return [TextContent(
                 type="text",
-                text=f"✅ Conectado\nEmpresa: {sap_client.company_db}\nSesión: {sap_client.session_id[:20]}..."
+                text=f"Conectado\nEmpresa: {sap_client.company_db}\nSesión: {sap_client.session_id[:20]}..."
             )]
         else:
             return [TextContent(
                 type="text",
-                text="❌ Desconectado"
+                text="Desconectado"
             )]
     
     elif name == "sap_create_sales_order":
@@ -179,26 +179,26 @@ async def handle_call_tool(name: str, arguments: dict[str, Any] | None) -> list[
             if not client:
                 return [TextContent(
                     type="text",
-                    text="❌ No se pudo conectar a SAP"
+                    text="No se pudo conectar a SAP"
                 )]
             
             if not arguments:
                 return [TextContent(
                     type="text",
-                    text="❌ Faltan argumentos para crear Sales Order"
+                    text="Faltan argumentos para crear Sales Order"
                 )]
             
             # Validar argumentos requeridos
             if "CardCode" not in arguments:
                 return [TextContent(
                     type="text",
-                    text="❌ CardCode es requerido"
+                    text="CardCode es requerido"
                 )]
             
             if "DocumentLines" not in arguments or not arguments["DocumentLines"]:
                 return [TextContent(
                     type="text",
-                    text="❌ DocumentLines es requerido y no puede estar vacío"
+                    text="DocumentLines es requerido y no puede estar vacío"
                 )]
             
             # Crear la Sales Order
@@ -223,24 +223,24 @@ async def handle_call_tool(name: str, arguments: dict[str, Any] | None) -> list[
                 
                 return [TextContent(
                     type="text",
-                    text=f"✅ Sales Order creada exitosamente:\n{json.dumps(summary, indent=2, ensure_ascii=False)}"
+                    text=f"Sales Order creada exitosamente:\n{json.dumps(summary, indent=2, ensure_ascii=False)}"
                 )]
             else:
                 return [TextContent(
                     type="text",
-                    text=f"✅ Sales Order creada exitosamente:\n{json.dumps(result, indent=2, ensure_ascii=False)}"
+                    text=f"Sales Order creada exitosamente:\n{json.dumps(result, indent=2, ensure_ascii=False)}"
                 )]
             
         except Exception as e:
             return [TextContent(
                 type="text",
-                text=f"❌ Error creando Sales Order: {str(e)}"
+                text=f"Error creando Sales Order: {str(e)}"
             )]
     
     else:
         return [TextContent(
             type="text",
-            text=f"❌ Herramienta desconocida: {name}"
+            text=f"Herramienta desconocida: {name}"
         )]
 
 @app.post("/mcp")
@@ -320,7 +320,7 @@ async def health():
     }
 
 if __name__ == "__main__":
-    logger.info("🚀 Iniciando servidor MCP HTTP para SAP...")
+    logger.info("Iniciando servidor MCP HTTP para SAP...")
     logger.info("Variables de entorno cargadas:")
     logger.info(f"  SAP_BASE_URL: {os.getenv('SAP_BASE_URL', 'No configurada')}")
     logger.info(f"  SAP_COMPANY_DB: {os.getenv('SAP_COMPANY_DB', 'No configurada')}")

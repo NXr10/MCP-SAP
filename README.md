@@ -4,26 +4,28 @@
 
 Servidor MCP (Model Context Protocol) para integrar SAP Business One con Microsoft Copilot Studio.
 
-## 🚀 Características
+##Características
 
-- **Conexión persistente** a SAP Business One Service Layer API
+-## Configuración
+
+### 1. Variables de Entorn## Despliegue en AzureConexión ## Integración con Copilot St## Pruebas del Protocolo MCPdioersistente*## Estructura del Proyecto a SAP Business## TroubleshootingOne Service Layer API
 - **Creación de Sales Orders** con validación completa
 - **Protocolo MCP Streamable** compatible con Microsoft Copilot Studio
 - **Deployment en Azure Container Apps** listo para producción
 
-## 🛠️ Herramientas Disponibles
+##Herramientas Disponibles
 
 1. **sap_connect** - Conectar a SAP Business One
 2. **sap_status** - Verificar estado de conexión
 3. **sap_create_sales_order** - Crear Sales Orders
 
-## 📋 Requisitos
+##Requisitos
 
 - Python 3.11+
 - SAP Business One con Service Layer habilitado
 - Variables de entorno configuradas
 
-## ⚙️ Configuración
+##Configuración
 
 1. Copiar `.env.example` a `.env`:
 ```bash
@@ -48,25 +50,25 @@ pip install -r requirements.txt
 python server.py
 ```
 
-## 🔗 Integración con Microsoft Copilot Studio
+##Integración con Microsoft Copilot Studio
 
-### 1. Schema File
+###1. Schema File
 Usar `sap-mcp-schema.yaml` como archivo de schema OpenAPI en Copilot Studio.
 
-### 2. Crear Custom Connector
+###2. Crear Custom Connector
 1. En Copilot Studio, ir a **Tools** → **Add a tool** → **New tool** → **Custom connector**
 2. Seleccionar **Import OpenAPI file**
 3. Subir el archivo `sap-mcp-schema.yaml`
 4. Completar la configuración siguiendo la [documentación oficial](https://learn.microsoft.com/en-us/microsoft-copilot-studio/mcp-add-existing-server-to-agent)
 
-### 3. Configurar Host
+###3. Configurar Host
 Actualizar el `host` en `sap-mcp-schema.yaml`:
 - Para desarrollo local: `localhost:8000`
 - Para producción: `your-domain.azurecontainerapps.io`
 
-## 🐳 Deployment
+##Deployment
 
-### Azure Container Apps
+###Azure Container Apps
 
 1. Configurar variables de entorno en Azure:
 ```bash
@@ -78,16 +80,16 @@ az containerapp env set-vars --name myapp-env --resource-group myresourcegroup -
 ./deploy-azure.ps1
 ```
 
-### Docker
+###Docker
 
 ```bash
 docker build -t sap-mcp-server .
 docker run -p 8000:8000 --env-file .env sap-mcp-server
 ```
 
-## 📊 Ejemplo de Uso
+##Ejemplo de Uso
 
-### Crear Sales Order
+###Crear Sales Order
 ```json
 {
   "jsonrpc": "2.0",
@@ -113,7 +115,7 @@ docker run -p 8000:8000 --env-file .env sap-mcp-server
 }
 ```
 
-### Respuesta
+###Respuesta
 ```json
 {
   "jsonrpc": "2.0",
@@ -122,7 +124,7 @@ docker run -p 8000:8000 --env-file .env sap-mcp-server
     "content": [
       {
         "type": "text",
-        "text": "✅ Sales Order creada exitosamente:
+        "text": "Sales Order creada exitosamente:
 {
   \"status\": \"success\",
   \"DocEntry\": 12345,
@@ -139,17 +141,17 @@ docker run -p 8000:8000 --env-file .env sap-mcp-server
 }
 ```
 
-## 🔍 Health Check
+##Health Check
 
 ```bash
 curl http://localhost:8000/health
 ```
 
-## 📄 Licencia
+##Licencia
 
 MIT License
 
-## 🤝 Contribuir
+##Contribuir
 
 1. Fork el proyecto
 2. Crear feature branch (`git checkout -b feature/AmazingFeature`)
@@ -157,11 +159,11 @@ MIT License
 4. Push to branch (`git push origin feature/AmazingFeature`)
 5. Abrir Pull Request
 
-## 🎯 Objetivo
+##Objetivo
 
 Exponer herramientas de SAP Business One Service Layer API mediante el protocolo MCP streamable para que Microsoft Copilot Studio pueda consumirlas como un custom connector.
 
-## 🏗️ Arquitectura
+##Arquitectura
 
 ```
 Microsoft Copilot Studio
@@ -171,26 +173,26 @@ Azure Container Apps (Public Endpoint)
 SAP Business One Server
 ```
 
-## � Características
+##� Características
 
-### Herramientas MCP Disponibles
+###Herramientas MCP Disponibles
 
 - **`sap_connect`**: Conectar a SAP Business One
 - **`sap_status`**: Verificar estado de conexión
 - **`sap_create_sales_order`**: Crear Sales Orders con validación completa
 
-### Recursos MCP Disponibles
+###Recursos MCP Disponibles
 
 - **`sap://status`**: Estado actual de la conexión SAP
 
-### Endpoints HTTP
+###Endpoints HTTP
 
 - **`POST /mcp`**: Endpoint principal para protocolo MCP streamable
 - **`GET /health`**: Verificación de salud del servidor
 
-## 🛠️ Configuración
+##🛠️ Configuración
 
-### 1. Variables de Entorno
+###1. Variables de Entorno
 
 Crea un archivo `.env` basado en `.env.example`:
 
@@ -208,7 +210,7 @@ SAP_USERNAME=your_username
 SAP_PASSWORD=your-password
 ```
 
-### 2. Desarrollo Local
+###2. Desarrollo Local
 
 ```bash
 # Instalar dependencias
@@ -220,7 +222,7 @@ python server.py
 
 El servidor estará disponible en `http://localhost:8000`
 
-### 3. Probar Localmente
+###3. Probar Localmente
 
 ```bash
 # Verificar salud del servidor
@@ -232,15 +234,15 @@ curl -X POST http://localhost:8000/mcp \
   -d '{"jsonrpc":"2.0","method":"tools/list","id":1}'
 ```
 
-## ☁️ Despliegue en Azure
+##☁️ Despliegue en Azure
 
-### Prerequisitos
+###Prerequisitos
 
 - Azure CLI instalado y configurado
 - Azure Container Registry creado
 - Permisos para crear Container Apps
 
-### Despliegue Automatizado
+###Despliegue Automatizado
 
 ```powershell
 # Ejecutar script de despliegue
@@ -252,7 +254,7 @@ curl -X POST http://localhost:8000/mcp \
                    -SubnetName "subnet-container-apps"
 ```
 
-### Configurar Secrets en Azure
+###Configurar Secrets en Azure
 
 ```bash
 # Variables de entorno en Container App
@@ -263,9 +265,9 @@ az containerapp secret set --name app-sap-mcp --resource-group rg-mcp-sap \
             sap-password="your-password"
 ```
 
-## 🔌 Integración con Copilot Studio
+##🔌 Integración con Copilot Studio
 
-### 1. Crear Custom Connector
+###1. Crear Custom Connector
 
 1. Ir a **Power Platform Admin Center**
 2. Seleccionar **Custom Connectors** → **New custom connector** → **Import from OpenAPI file**
@@ -275,14 +277,14 @@ az containerapp secret set --name app-sap-mcp --resource-group rg-mcp-sap \
    https://app-sap-mcp-test.bravewater-b67ade29.eastus.azurecontainerapps.io
    ```
 
-### 2. Configurar en Copilot Studio
+###2. Configurar en Copilot Studio
 
 1. Abrir **Copilot Studio**
 2. Ir a **Settings** → **Generative AI** → **Custom Actions**
 3. Agregar el custom connector creado
 4. Las herramientas SAP aparecerán automáticamente como acciones disponibles
 
-### 3. Ejemplo de Uso en Copilot
+###3. Ejemplo de Uso en Copilot
 
 ```
 Usuario: "Conecta a SAP y crea una orden de venta"
@@ -292,9 +294,9 @@ Copilot ejecutará:
 2. sap_create_sales_order(CardCode="CUSTOMER", DocumentLines=[...]) - para crear la orden
 ```
 
-## 🧪 Pruebas del Protocolo MCP
+##🧪 Pruebas del Protocolo MCP
 
-### Ejemplo de Solicitud MCP
+###Ejemplo de Solicitud MCP
 
 ```json
 {
@@ -317,7 +319,7 @@ Copilot ejecutará:
 }
 ```
 
-### Ejemplo de Respuesta MCP
+###Ejemplo de Respuesta MCP
 
 ```json
 {
@@ -327,14 +329,14 @@ Copilot ejecutará:
     "content": [
       {
         "type": "text",
-        "text": "✅ Sales Order creada exitosamente: DocEntry 12345"
+        "text": "Sales Order creada exitosamente: DocEntry 12345"
       }
     ]
   }
 }
 ```
 
-## 📁 Estructura del Proyecto
+##📁 Estructura del Proyecto
 
 ```
 MCP-SAP-main/
@@ -349,9 +351,9 @@ MCP-SAP-main/
 └── README.md              # Este archivo
 ```
 
-## 🔧 Desarrollo
+## Desarrollo
 
-### Agregar Nueva Herramienta
+###Agregar Nueva Herramienta
 
 1. Definir en `handle_list_tools()`:
 ```python
@@ -375,9 +377,9 @@ elif name == "nueva_herramienta":
     return [TextContent(type="text", text="Resultado")]
 ```
 
-## 🔍 Troubleshooting
+##🔍 Troubleshooting
 
-### Problemas Comunes
+###Problemas Comunes
 
 1. **Error de conexión SAP**:
    - Verificar variables de entorno
@@ -393,7 +395,7 @@ elif name == "nueva_herramienta":
    - Comprobar URL del host en custom connector
    - Validar protocolo `mcp-streamable-1.0`
 
-### Logs y Debugging
+###Logs y Debugging
 
 ```bash
 # Ver logs locales
@@ -409,14 +411,14 @@ curl -X POST https://your-container-app.azurecontainerapps.io/mcp \
   -d '{"jsonrpc":"2.0","method":"tools/list","id":1}'
 ```
 
-## 📚 Referencias
+## Referencias
 
 - [Model Context Protocol (MCP)](https://modelcontextprotocol.io/)
 - [SAP Business One Service Layer API](https://help.sap.com/docs/SAP_BUSINESS_ONE/68a2e87fb29941b5bf959a184d9c6727/16f20002dd5645ad84f3853d08e76a0f.html)
 - [Microsoft Copilot Studio Custom Connectors](https://docs.microsoft.com/en-us/connectors/custom-connectors/)
 - [Azure Container Apps](https://docs.microsoft.com/en-us/azure/container-apps/)
 
-## 🤝 Contribución
+## Contribución
 
 1. Fork el repositorio
 2. Crear rama feature: `git checkout -b feature/nueva-caracteristica`
@@ -424,11 +426,11 @@ curl -X POST https://your-container-app.azurecontainerapps.io/mcp \
 4. Push a la rama: `git push origin feature/nueva-caracteristica`
 5. Crear Pull Request
 
-## 📄 Licencia
+##📄 Licencia
 
 Este proyecto está bajo la Licencia MIT. Ver archivo `LICENSE` para más detalles.
 
-## 🆘 Soporte
+##🆘 Soporte
 
 - **Issues**: [GitHub Issues](https://github.com/NXr10/MCP-SAP/issues)
 - **Documentación**: [Wiki del proyecto](https://github.com/NXr10/MCP-SAP/wiki)
@@ -436,9 +438,9 @@ Este proyecto está bajo la Licencia MIT. Ver archivo `LICENSE` para más detall
     --secrets "sap-username=tu-usuario" "sap-password=tu-password"
 ```
 
-## 🔧 Configuración Manual
+##🔧 Configuración Manual
 
-### Crear VNet y Subnet (si no existe)
+###Crear VNet y Subnet (si no existe)
 
 ```bash
 # Crear VNet
@@ -457,7 +459,7 @@ az network vnet subnet update \
     --delegations Microsoft.App/environments
 ```
 
-### Configurar NSG para SAP
+###Configurar NSG para SAP
 
 ```bash
 # Crear regla para permitir tráfico a SAP
@@ -473,9 +475,9 @@ az network nsg rule create \
     --destination-address-prefixes 10.0.0.0/16
 ```
 
-## 📊 Verificación
+##📊 Verificación
 
-### Ver logs de la aplicación
+###Ver logs de la aplicación
 
 ```bash
 az containerapp logs show \
@@ -484,7 +486,7 @@ az containerapp logs show \
     --follow
 ```
 
-### Verificar conectividad
+###Verificar conectividad
 
 ```bash
 # Entrar al contenedor para debug
@@ -496,38 +498,38 @@ az containerapp exec \
 echo $SAP_BASE_URL
 ```
 
-## 🔐 Seguridad
+##🔐 Seguridad
 
-### Variables de entorno configuradas:
+###Variables de entorno configuradas:
 
 - `SAP_BASE_URL`: URL de tu SAP Business One API
 - `SAP_COMPANY_DB`: Base de datos de la compañía
 - `SAP_USERNAME`: Usuario SAP
 - `SAP_PASSWORD`: Contraseña SAP (almacenada como secreto)
 
-### Mejores prácticas:
+###Mejores prácticas:
 
 - Credenciales almacenadas como secretos de Container Apps
 - VNet isolation para comunicación privada con SAP
 - Contenedor ejecutándose con usuario no-root
 - Recursos limitados (CPU/Memory)
 
-## 🛠️ Troubleshooting
+##🛠️ Troubleshooting
 
-### Error de conectividad a SAP
+###Error de conectividad a SAP
 
 1. Verificar que SAP esté ejecutándose
 2. Verificar NSG rules
 3. Verificar que las IPs sean correctas
 4. Verificar credenciales
 
-### Error de despliegue
+###Error de despliegue
 
 1. Verificar permisos en Azure
 2. Verificar que el nombre del Container Registry sea único
 3. Verificar que la VNet exista
 
-### Ver logs detallados
+###Ver logs detallados
 
 ```bash
 az containerapp logs show \
@@ -536,7 +538,7 @@ az containerapp logs show \
     --type console
 ```
 
-## 📞 Soporte
+##📞 Soporte
 
 Para problemas específicos:
 
@@ -545,7 +547,7 @@ Para problemas específicos:
 3. Probar credenciales SAP desde Postman
 4. Verificar configuración de secretos
 
-## 🔄 Actualizaciones
+##🔄 Actualizaciones
 
 Para actualizar la aplicación:
 
